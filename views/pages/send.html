@@ -1,0 +1,100 @@
+{{ template "pages/layout" . }}
+
+{{ define "summary" }}
+<p class="text-sm leading-relaxed font-light">
+    Start sending by clicking on <b class="underline decoration-dotted">Start sending</b>.
+    You will be provided with a transfer link, share with the receiver, select file
+    and click <b class="underline decoration-dotted">Upload now</b> to start sending.
+</p>
+{{ end }}
+
+{{ define "send-request-form" }}
+<form hx-post="/send" hx-swap="outerHTML"
+    class="p-4 space-y-8 bg-zinc-800 backdrop-blur-sm text-white rounded-2xl shadow-xl group-hover:scale-[1.01] transition-transform duration-500">
+    <h2 class="text-2xl text-center">Send file</h2>
+
+    {{ template "summary" }}
+
+    <div class="flex justify-center">
+        <div class="h-10 px-3 inline-flex items-center gap-2 bg-zinc-700 text-white rounded-md">
+            <p class="w-36 text-center font-medium text-xl uppercase">--------</p>
+            <button type="button" disabled>
+                {{ template "components/icons/copy" map "class" "size-5" }}
+            </button>
+        </div>
+    </div>
+
+    <button type="submit"
+        class="w-full h-12 bg-white text-black hover:bg-zinc-600 hover:text-white font-medium transition-colors rounded-2xl">
+        Start sending
+    </button>
+</form>
+{{ end }}
+
+{{ define "send-upload-form" }}
+<form hx-post="/transfer/{{ .ID }}" hx-swap="none" enctype="multipart/form-data"
+    class="p-4 space-y-8 bg-zinc-800 text-white rounded-2xl shadow-xl group-hover:scale-[1.01] transition-transform duration-500"
+    x-data="{ loading: false, copied: false, url: new URL('/receive?id={{ .ID }}', window.location.origin) }">
+    <h2 class="text-2xl text-center">Send file</h2>
+
+    {{ template "summary" }}
+
+    <div class="flex justify-center">
+        <div x-show="!copied" class="h-10 px-3 inline-flex items-center gap-2 bg-zinc-700 text-white rounded-md">
+            <p class="w-36 text-center font-medium text-lg">{{ .ID }}</p>
+            <button type="button"
+                x-on:click="(copied = true) && navigator.clipboard.writeText(url.toString()) && alert('Transfer link copied')">
+                {{ template "components/icons/copy" map "class" "size-5" }}
+            </button>
+        </div>
+        <div x-show="copied" class="h-10 px-3 inline-flex items-center gap-2 bg-zinc-700 text-white rounded-md">
+            <input required name="file" x-ref="fileInput" value="{{ .ID }}" type="file" placeholder="Select file"
+                class="w-48 font-medium text-sm bg-transparent focus:outline-none">
+            <button type="button" x-on:click="$refs.fileInput.click()">
+                {{ template "components/icons/attachment" map "class" "size-5" }}
+            </button>
+        </div>
+    </div>
+
+    <button x-show="!copied" x-on:click="copied = true" type="button"
+        class="w-full h-12 bg-white text-black hover:bg-zinc-600 hover:text-white font-medium transition-colors rounded-2xl">
+        Select file
+    </button>
+    <button x-show="copied && !loading" x-on:click="loading = $el.closest('form').checkValidity()" type="submit"
+        class="w-full h-12 bg-white text-black hover:bg-zinc-600 hover:text-white font-medium transition-colors rounded-2xl">
+        Upload now
+    </button>
+    <button disabled
+        class="flex items-center justify-center w-full h-12 bg-white text-black hover:bg-zinc-600 hover:text-white font-medium transition-colors rounded-2xl"
+        x-show="copied && loading">
+        Uploading {{ template "components/icons/spinner" map "class" "ml-2 size-5" }}
+    </button>
+</form>
+{{ end }}
+
+{{ define "completed" }}
+<div
+    class="flex flex-col items-center justify-center gap-4 p-4 bg-zinc-800 text-white rounded-2xl shadow-xl group-hover:scale-[1.01] transition-transform duration-500">
+    {{ template "components/icons/check-circle" map "class" "size-8" }}
+    <h2 class="text-2xl">Send complete</h2>
+</div>
+{{ end }}
+
+{{ define "content" }}
+<main>
+    <section class="mt-8 md:mt-28 p-4">
+        <div x-data="{ complete: false }" x-on:progress-complete="complete = true"
+            class="group max-w-md md:max-w-3xl mx-auto grid md:grid-cols-2 gap-2 p-2 bg-zinc-100 border rounded-3xl overflow-hidden">
+            <div x-show="!complete" class="min-h-80 *:size-full">
+                {{ template "send-request-form" }}
+            </div>
+            <div x-show="complete" class="min-h-80 *:size-full">
+                {{ template "completed" }}
+            </div>
+            <div class="min-h-80 *:max-h-80 *:size-full">
+                {{ template "partials/activity" }}
+            </div>
+        </div>
+    </section>
+</main>
+{{ end }}

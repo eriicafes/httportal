@@ -1,0 +1,95 @@
+{{ template "pages/layout" . }}
+
+{{ define "summary" }}
+<p class="text-sm leading-relaxed font-light">
+    Enter transfer code to join connection. <br>
+    Start receiving by clicking on <b class="underline decoration-dotted">Start receiving</b>.
+    Confirm download by clicking on <b class="underline decoration-dotted">Download now</b>.
+</p>
+{{ end }}
+
+{{ define "receive-request-form" }}
+<form hx-post="/receive" hx-swap="outerHTML"
+    class="p-4 space-y-8 bg-zinc-800 text-white rounded-2xl shadow-xl group-hover:scale-[1.01] transition-transform duration-500">
+    <h2 class="text-2xl text-center">Receive file</h2>
+
+    {{ template "summary" }}
+
+    <div class="flex justify-center">
+        <div class="h-10 px-3 inline-flex items-center gap-2 bg-zinc-700 text-white rounded-md">
+            <input required name="id" type="text" placeholder="Enter Transfer Code" autocomplete="off" maxlength="7"
+                class="w-36 text-center font-medium text-sm placeholder:text-zinc-300 bg-transparent focus:outline-none">
+            <button type="button">
+                {{ template "components/icons/arrow-down" map "class" "size-5" }}
+            </button>
+        </div>
+    </div>
+
+    <button type="submit"
+        class="w-full h-12 bg-white text-black hover:bg-zinc-600 hover:text-white font-medium transition-colors rounded-2xl">
+        Start receiving
+    </button>
+</form>
+{{ end }}
+
+{{ define "receive-download-form" }}
+<div x-data="{ loading: false }"
+    class="p-4 space-y-8 bg-zinc-800 text-white rounded-2xl shadow-xl group-hover:scale-[1.01] transition-transform duration-500">
+    <h2 class="text-2xl text-center">Receive file</h2>
+
+    {{ template "summary" }}
+
+    <div class="flex justify-center">
+        <div class="h-10 px-3 inline-flex items-center gap-2 bg-zinc-700 text-white rounded-md">
+            <input disabled name="id" value="{{ .ID }}" type="text" placeholder="Enter Transfer Code" autocomplete="off"
+                maxlength="7"
+                class="w-36 text-center font-medium text-sm placeholder:text-zinc-300 bg-transparent focus:outline-none">
+            <button type="button">
+                {{ template "components/icons/arrow-down" map "class" "size-5" }}
+            </button>
+        </div>
+    </div>
+
+    <a href="/transfer/{{ .ID }}" download
+        class="flex items-center justify-center w-full h-12 bg-white text-black hover:bg-zinc-600 hover:text-white font-medium transition-colors rounded-2xl"
+        x-show="!loading" x-on:click="loading = true">
+        Download now
+    </a>
+    <button disabled
+        class="flex items-center justify-center w-full h-12 bg-white text-black hover:bg-zinc-600 hover:text-white font-medium transition-colors rounded-2xl"
+        x-show="loading">
+        Downloading {{ template "components/icons/spinner" map "class" "ml-2 size-5" }}
+    </button>
+</div>
+{{ end }}
+
+{{ define "completed" }}
+<div
+    class="flex flex-col items-center justify-center gap-4 p-4 bg-zinc-800 text-white rounded-2xl shadow-xl group-hover:scale-[1.01] transition-transform duration-500">
+    {{ template "components/icons/check-circle" map "class" "size-8" }}
+    <h2 class="text-2xl">Receive complete</h2>
+</div>
+{{ end }}
+
+{{ define "content" }}
+<main>
+    <section class="mt-8 md:mt-28 p-4">
+        <div x-data="{ complete: false }" x-on:progress-complete="complete = true"
+            class="group max-w-md md:max-w-3xl mx-auto grid md:grid-cols-2 gap-2 p-2 bg-zinc-100 border rounded-3xl overflow-hidden">
+            <div x-show="!complete" class="min-h-80 *:size-full">
+                {{ if .ID }}
+                {{ template "receive-download-form" . }}
+                {{ else }}
+                {{ template "receive-request-form" }}
+                {{ end }}
+            </div>
+            <div x-show="complete" class="min-h-80 *:size-full">
+                {{ template "completed" }}
+            </div>
+            <div class="min-h-80 *:max-h-80 *:size-full">
+                {{ template "partials/activity" . }}
+            </div>
+        </div>
+    </section>
+</main>
+{{ end }}

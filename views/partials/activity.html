@@ -1,0 +1,52 @@
+{{ define "activity-connector" }}
+{{ if .ID }}
+<div class="hidden" id="activity-connector" hx-swap-oob="true" hx-ext="sse" sse-connect="/transfer/{{ .ID }}/events">
+    <div sse-swap="message" hx-target="#activity-items" hx-swap="afterbegin"></div>
+    <div sse-swap="progress" hx-target="#activity-progress" hx-swap="outerHTML"></div>
+    <div sse-swap="close" hx-target="#activity-connector" hx-swap="delete"></div>
+</div>
+{{ else }}
+<div class="hidden" id="activity-connector"></div>
+{{ end }}
+{{ end }}
+
+{{ define "activity-item" }}
+<p class="px-3 py-3 text-sm">{{ .Data }}</p>
+{{ end }}
+
+{{ define "activity-progress" }}
+{{ if .Progress }}
+<div id="activity-progress" class="shrink-0 space-y-1 p-1">
+    <p class="text-xs text-center">
+        {{- if eq .Progress "100%" -}}Downloaded{{ else }}Downloading... {{ .Progress }}{{- end -}}
+    </p>
+    <div class="bg-white h-2.5 rounded-full border overflow-hidden">
+        <div style="--progress: {{ .Progress }}"
+            class="w-[var(--progress)] transition-[width] duration-500 bg-zinc-800 h-full rounded-full">
+        </div>
+    </div>
+    {{ if eq .Progress "100%" }}<div class="hidden" x-init="$dispatch('progress-complete')"></div>{{ end }}
+</div>
+{{ else }}
+<div id="activity-progress" class="shrink-0 space-y-1 p-1">
+    <p class="text-xs text-center">Waiting...</p>
+    <div class="bg-white h-2.5 rounded-full border overflow-hidden">
+        <div style="--progress: 0%"
+            class="w-[var(--progress)] transition-[width] duration-500 bg-zinc-800 h-full rounded-full">
+        </div>
+    </div>
+</div>
+{{ end }}
+{{ end }}
+
+<div class="flex flex-col overflow-hidden">
+    {{ template "activity-connector" . }}
+    <h3 class="font-medium text-black text-center p-2 md:pt-0">Activity</h3>
+    <div id="activity-items" class="flex-1 peer empty:hidden flex flex-col divide-y text-zinc-700 overflow-y-scroll">
+        {{- "" -}}
+    </div>
+    <div class="flex-1 hidden peer-empty:flex items-center justify-center">
+        <p class="opacity-60 text-sm">No activity yet.</p>
+    </div>
+    {{ template "activity-progress" }}
+</div>

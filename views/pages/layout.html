@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="description" content="Send files in realtime to anyone anywhere">
+    <title>HTTPortal - {{ .Data.Title }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap"
+        rel="stylesheet">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ public " /apple-touch-icon.png" }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ public " /favicon-32x32.png" }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ public " /favicon-16x16.png" }}">
+    <link rel="manifest" href="{{ public " /site.webmanifest" }}">
+    <meta property="og:title" content="HTTPortal" />
+    <meta property="og:description" content="Send files in realtime to anyone anywhere." />
+    <meta property="og:image" content="{{ public " /logo.png" }}" />
+    {{ vite "resources/main.ts" }}
+    {{ block "head" .Child }}{{ end }}
+</head>
+
+<body x-data hx-ext="response-targets">
+    <header class="relative border-b">
+        <div class="flex items-center justify-between h-12 mx-auto max-w-4xl px-4">
+            <a href="/" class="font-bold text-lg inline-flex items-center">
+                {{ template "components/icons/zap" map "class" "size-5" }}
+                HTTPortal
+            </a>
+
+            <nav class="hidden sm:flex items-center gap-6 text-sm">
+                <a href="/send" class="hover:underline">Send</a>
+                <a href="/receive" class="hover:underline">Receive</a>
+            </nav>
+
+            <a href="/send"
+                class="bg-zinc-800 hover:bg-zinc-200 text-white hover:text-zinc-800 transition-colors font-medium text-sm px-4 py-1.5 rounded-lg">
+                Get started
+            </a>
+        </div>
+
+        <div class="hidden has-[#notifications>*]:block absolute top-full right-0 w-full sm:max-w-xs py-2 px-4">
+            <div id="notifications"
+                class="flex flex-col bg-white shadow-md rounded-xl border divide-y max-h-80 overflow-y-scroll"
+                x-data="{ show: true, timeout: null }"
+                x-on:mouseover.throttle.2000ms="clearTimeout(timeout); show = true"
+                x-on:mouseleave="timeout = setTimeout(() => { show = false }, 5000)"
+                x-on:reset-timeout="clearTimeout(timeout); show = true; timeout = setTimeout(() => { show = false }, 5000)">
+            </div>
+        </div>
+    </header>
+    {{ template "content" .Child }}
+    {{ block "scripts" .Child }}{{ end }}
+</body>
+
+</html>

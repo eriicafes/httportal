@@ -1,0 +1,14 @@
+{{ template "pages/layout" . }}
+{{ define "content" }}
+<main>
+    <section class="mt-20 sm:mt-28 p-4">
+        <div class="group max-w-sm mx-auto p-2 bg-zinc-100 border rounded-3xl overflow-hidden">
+            <div
+                class="h-80 flex flex-col items-center justify-center gap-2 p-4 bg-zinc-800 text-white rounded-2xl shadow-xl">
+                <h3 class="font-medium text-center sm:pt-0 text-2xl">{{ .Message }}</h3>
+                <p class="opacity-60 text-sm">{{ .Desc }}</p>
+            </div>
+        </div>
+    </section>
+</main>
+{{ end }}

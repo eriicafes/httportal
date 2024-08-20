@@ -1,0 +1,12 @@
+<div x-on:remove-item="$el.remove()" x-init="$dispatch('reset-timeout')" x-effect="!show && $el.remove()"
+    class="px-3 py-2 text-sm space-y-1 bg-white hover:bg-zinc-50 transition-colors">
+    <div class="{{ if .Error }}text-red-500 {{ end -}} flex items-center justify-between gap-2">
+        <p class="capitalize font-medium">{{ .Message }}</p>
+        <button x-on:click="$dispatch('remove-item')" class="p-0.5">
+            {{ template "components/icons/close" map "class" "size-4" }}
+        </button>
+    </div>
+    {{ if .Desc }}
+    <p class="text-xs text-zinc-600">{{ .Desc }}</p>
+    {{ end }}
+</div>
