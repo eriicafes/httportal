@@ -24,9 +24,7 @@ func New(tp tmpl.Templates, p *Portal) *App {
 	return &App{Templates: tp, portal: p}
 }
 
-func (app *App) Mux() *http.ServeMux {
-	mux := http.NewServeMux()
-
+func (app *App) Mount(mux *http.ServeMux) {
 	mux.HandleFunc("GET /{$}", app.withError(app.home))
 	mux.HandleFunc("GET /send", app.withError(app.send))
 	mux.HandleFunc("POST /send", app.withError(app.sendPost))
@@ -35,8 +33,6 @@ func (app *App) Mux() *http.ServeMux {
 	mux.Handle("POST /transfer/{id}", http.TimeoutHandler(app.withError(app.transferUpload), time.Minute*5, "Upload timed out"))
 	mux.Handle("GET /transfer/{id}", http.TimeoutHandler(app.withError(app.transferDownload), time.Minute*5, "Download timed out"))
 	mux.HandleFunc("GET /transfer/{id}/events", app.withError(app.transferEvents))
-
-	return mux
 }
 
 func (app *App) home(w http.ResponseWriter, r *http.Request) error {

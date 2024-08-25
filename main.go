@@ -22,14 +22,13 @@ func main() {
 		Autoload("components", "partials").
 		LoadWithLayouts("pages").
 		MustParse()
-	portal := app.NewPortal()
-	mux := app.New(tp, portal).Mux()
+	app := app.New(tp, app.NewPortal())
 
-	mux.Handle("GET /static/", http.StripPrefix("/static", vite.FileServer()))
+	app.Mount(http.DefaultServeMux)
+	http.Handle("GET /static/", http.StripPrefix("/static", vite.FileServer()))
 
 	log.Println("server listening on port 8080...")
-	err = http.ListenAndServe(":8080", mux)
-	if err != nil {
+	if err = http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)
 	}
 }
