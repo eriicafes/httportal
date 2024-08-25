@@ -11,7 +11,8 @@ import (
 )
 
 func main() {
-	vite, err := vite.New("dist", "public", "static", "5173", false)
+	envs := GetEnvs()
+	vite, err := vite.New("dist", "public", "static", "5173", !envs.NodeEnv.IsProduction())
 	if err != nil {
 		panic(err)
 	}
@@ -27,8 +28,8 @@ func main() {
 	app.Mount(http.DefaultServeMux)
 	http.Handle("GET /static/", http.StripPrefix("/static", vite.FileServer()))
 
-	log.Println("server listening on port 8080...")
-	if err = http.ListenAndServe(":8080", nil); err != nil {
+	log.Printf("Server listening on port %d\n", envs.Port)
+	if err = http.ListenAndServe(envs.Port.Addr(), nil); err != nil {
 		panic(err)
 	}
 }
