@@ -1,6 +1,22 @@
+networks:
+  caddy:
 services:
   web:
     build: .
     restart: unless-stopped
     ports:
-      - 80:8080
+      - 8080:8080
+    networks:
+      - caddy
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - /data/caddy/data:/data
+      - /data/caddy/config:/config
+    networks:
+      - caddy

@@ -1,0 +1,3 @@
+srv.eriicafes.com {
+    reverse_proxy web:8080
+}
