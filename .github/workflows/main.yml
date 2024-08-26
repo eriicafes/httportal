@@ -11,12 +11,13 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Setup ssh keys
-        run: |
-          install -m 600 -D /dev/null ~/.ssh/id_ed25519
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
-      - name: Pull and deploy
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git pull && docker compose up -d --build && exit"
-      - name: Cleanup
-        run: rm -rf ~/.ssh
+      - name: SSH to server and Deploy App
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ${{ secrets.WORK_DIR }}
+            git pull origin main
+            docker compose up -d --build
